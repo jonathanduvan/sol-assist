@@ -29,4 +29,8 @@ export type SolarEstimate = {
   regionFactorKwhPerKw: number;
   utilityRatePerKwh: number;
   utilityProvider: UtilityProvider;
+
+  utilityEscalationRate: number;
+  firstYearUtilityValue: number;
+  tenYearUtilityValue: number;
 };

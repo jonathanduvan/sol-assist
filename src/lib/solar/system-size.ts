@@ -1,5 +1,6 @@
-import type { BillRange } from "@/types/lead";
+import type { BillRange, CustomerType } from "@/types/lead";
 import { estimateElectricityUsageFromBill } from "@/lib/solar/usage";
+import { getTargetOffset } from "@/lib/solar/offset";
 
 export type SystemSizeEstimate = {
   minKw: number;
@@ -12,11 +13,18 @@ export function estimateSystemSize(params: {
   billRange: BillRange;
   monthlyBillAmount?: number;
   utilityRatePerKwh: number;
+  regionFactorKwhPerKw: number;
+  customerType: CustomerType;
 }): SystemSizeEstimate {
   if (params.monthlyBillAmount && params.monthlyBillAmount > 0) {
     return estimateSystemSizeFromMonthlyBill({
       monthlyBillAmount: params.monthlyBillAmount,
       utilityRatePerKwh: params.utilityRatePerKwh,
+      regionFactorKwhPerKw: params.regionFactorKwhPerKw,
+      targetOffset: getTargetOffset({
+        customerType: params.customerType,
+        billRange: params.billRange,
+      }),
     });
   }
 
@@ -26,19 +34,18 @@ export function estimateSystemSize(params: {
 function estimateSystemSizeFromMonthlyBill(params: {
   monthlyBillAmount: number;
   utilityRatePerKwh: number;
+  regionFactorKwhPerKw: number;
+  targetOffset: number;
 }): SystemSizeEstimate {
-
   const usage = estimateElectricityUsageFromBill({
     monthlyBillAmount: params.monthlyBillAmount,
     utilityRatePerKwh: params.utilityRatePerKwh,
   });
 
   const annualKwh = usage.annualKwh;
-  
-  const targetOffset = 0.9;
-  const assumedProductionFactor = 1450;
 
-  const midpointKw = (annualKwh * targetOffset) / assumedProductionFactor;
+  const midpointKw =
+    (annualKwh * params.targetOffset) / params.regionFactorKwhPerKw;
 
   const minKw = roundToHalf(midpointKw * 0.85);
   const maxKw = roundToHalf(midpointKw * 1.15);
@@ -51,7 +58,9 @@ function estimateSystemSizeFromMonthlyBill(params: {
   };
 }
 
-function estimateSystemSizeFromBillRange(billRange: BillRange): SystemSizeEstimate {
+function estimateSystemSizeFromBillRange(
+  billRange: BillRange
+): SystemSizeEstimate {
   switch (billRange) {
     case "250-plus":
       return {
