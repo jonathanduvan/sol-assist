@@ -15,6 +15,14 @@ type Props = {
   score: number;
 };
 
+function formatCurrency(value: number) {
+  return `$${value.toLocaleString()}`;
+}
+
+function formatPercent(value: number) {
+  return `${Math.round(value * 100)}%/yr`;
+}
+
 function formatPercentLabel(value: number) {
   return `${Math.round(value * 100)}¢/kWh`;
 }
@@ -68,6 +76,23 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
           <ResultMetricCard
             label="Electric Bill"
             value={billLabel}
+          />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <ResultMetricCard
+            label="First-Year Energy Value"
+            value={formatCurrency(estimate.firstYearUtilityValue)}
+          />
+
+          <ResultMetricCard
+            label="10-Year Utility Value"
+            value={formatCurrency(estimate.tenYearUtilityValue)}
+          />
+
+          <ResultMetricCard
+            label="Assumed Utility Increase"
+            value={formatPercent(estimate.utilityEscalationRate)}
           />
         </div>
 

@@ -33,4 +33,10 @@ export type SolarEstimate = {
   utilityEscalationRate: number;
   firstYearUtilityValue: number;
   tenYearUtilityValue: number;
+
+  solarRatePerKwh: number;
+  solarEscalationRate: number;
+  firstYearSolarCost: number;
+  tenYearSolarCost: number;
+  tenYearEstimatedSavingsVsUtility: number;
 };

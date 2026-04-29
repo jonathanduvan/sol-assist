@@ -17,6 +17,8 @@ import {
   estimateMonthlySavingsRange,
 } from "@/lib/solar/savings";
 import { projectUtilityValue } from "@/lib/solar/escalation";
+import { projectSolarRateCost } from "@/lib/solar/solar-rate";
+
 
 export function estimateSolar(input: LeadInput): SolarEstimate {
   const state = inferStateFromLeadAddress({
@@ -57,6 +59,10 @@ export function estimateSolar(input: LeadInput): SolarEstimate {
     years: 10,
   });
 
+  const solarRateProjection = projectSolarRateCost({
+    annualProductionKwh: annualProduction.midpointAnnualProductionKwh,
+  });
+
   const savings = estimateMonthlySavingsRange({
     annualProductionKwh: annualProduction.midpointAnnualProductionKwh,
     utilityRatePerKwh,
@@ -90,6 +96,14 @@ export function estimateSolar(input: LeadInput): SolarEstimate {
     utilityEscalationRate: utilityProjection.utilityEscalationRate,
     firstYearUtilityValue: utilityProjection.firstYearUtilityValue,
     tenYearUtilityValue: utilityProjection.projectedUtilityValue,
+
+    solarRatePerKwh: solarRateProjection.solarRatePerKwh,
+    solarEscalationRate: solarRateProjection.solarEscalationRate,
+    firstYearSolarCost: solarRateProjection.firstYearSolarCost,
+    tenYearSolarCost: solarRateProjection.tenYearSolarCost,
+    tenYearEstimatedSavingsVsUtility:
+    utilityProjection.projectedUtilityValue - solarRateProjection.tenYearSolarCost,
+    
   };
 }
 

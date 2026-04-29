@@ -34,6 +34,13 @@ export function CalculationBreakdown({ estimate }: Props) {
           </p>
 
           <p>
+            Utility increase:{" "}
+            <span className="font-medium text-foreground">
+              {Math.round(estimate.utilityEscalationRate * 100)}%/year
+            </span>
+          </p>
+
+          <p>
             Confidence:{" "}
             <span className="font-medium text-foreground">
               {estimate.confidence}
@@ -47,7 +54,10 @@ export function CalculationBreakdown({ estimate }: Props) {
             </span>
           </p>
         </div>
-
+        <p>
+          The 10-year value estimate applies an assumed annual utility increase to the
+          value of energy the system is expected to produce.
+        </p>
         <p>
           Final savings depend on roof layout, shading, utility rules, equipment,
           system design, and financing terms.
