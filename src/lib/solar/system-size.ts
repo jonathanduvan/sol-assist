@@ -1,4 +1,5 @@
 import type { BillRange } from "@/types/lead";
+import { estimateElectricityUsageFromBill } from "@/lib/solar/usage";
 
 export type SystemSizeEstimate = {
   minKw: number;
@@ -26,9 +27,14 @@ function estimateSystemSizeFromMonthlyBill(params: {
   monthlyBillAmount: number;
   utilityRatePerKwh: number;
 }): SystemSizeEstimate {
-  const monthlyKwh = params.monthlyBillAmount / params.utilityRatePerKwh;
-  const annualKwh = monthlyKwh * 12;
 
+  const usage = estimateElectricityUsageFromBill({
+    monthlyBillAmount: params.monthlyBillAmount,
+    utilityRatePerKwh: params.utilityRatePerKwh,
+  });
+
+  const annualKwh = usage.annualKwh;
+  
   const targetOffset = 0.9;
   const assumedProductionFactor = 1450;
 
