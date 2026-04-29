@@ -6,6 +6,7 @@ import type { LeadInput } from "@/types/lead";
 import type { SolarEstimate } from "@/types/solar";
 import { ResultMetricCard } from "./ResultMetricCard";
 import { formatUtilityProvider } from "@/lib/solar/utility-provider";
+import { CalculationBreakdown } from "./CalculationBreakdown";
 import Link from "next/link";
 
 type Props = {
@@ -91,7 +92,7 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
           />
 
         </div>
-
+        <CalculationBreakdown estimate={estimate} />
         <Card className="rounded-2xl bg-muted">
           <CardContent className="space-y-2 p-4 text-sm text-muted-foreground">
             <p>
