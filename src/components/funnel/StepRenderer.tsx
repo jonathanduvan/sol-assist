@@ -52,8 +52,8 @@ export function StepRenderer({ step, lead, onUpdate, onNext }: Props) {
       return (
         <BillStep
           customerType={lead.customerType}
-          onSelect={(billRange) => {
-            onUpdate({ billRange });
+          onSelect={(billRange, monthlyBillAmount) => {
+            onUpdate({ billRange, monthlyBillAmount });
             onNext();
           }}
         />
