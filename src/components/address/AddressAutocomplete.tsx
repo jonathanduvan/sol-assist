@@ -9,6 +9,9 @@ export type SelectedAddress = {
   placeId: string;
   latitude: number | null;
   longitude: number | null;
+  stateCode?: string;
+  city?: string;
+  postalCode?: string;
 };
 
 type AddressPrediction = {
@@ -27,6 +30,31 @@ type Props = {
 
 let googleMapsOptionsSet = false;
 let placesLibraryPromise: Promise<google.maps.PlacesLibrary> | null = null;
+
+function getAddressComponent(
+  components: google.maps.places.AddressComponent[] | undefined,
+  type: string
+) {
+  return components?.find((component) => component.types.includes(type));
+}
+
+function parseAddressComponents(
+  components: google.maps.places.AddressComponent[] | undefined
+) {
+  const state = getAddressComponent(components, "administrative_area_level_1");
+  const city =
+    getAddressComponent(components, "locality") ??
+    getAddressComponent(components, "postal_town") ??
+    getAddressComponent(components, "administrative_area_level_3");
+
+  const postalCode = getAddressComponent(components, "postal_code");
+
+  return {
+    stateCode: state?.shortText,
+    city: city?.longText,
+    postalCode: postalCode?.longText,
+  };
+}
 
 async function loadPlacesLibrary() {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
@@ -158,18 +186,21 @@ export function AddressAutocomplete({
       const place = prediction.placePrediction.toPlace();
 
       await place.fetchFields({
-        fields: ["formattedAddress", "location", "id"],
+        fields: ["formattedAddress", "location", "id", "addressComponents"],
       });
 
       const formattedAddress = place.formattedAddress || prediction.fullText;
 
       selectedValueRef.current = formattedAddress;
 
+      const parsedAddress = parseAddressComponents(place.addressComponents);
+
       const selectedAddress: SelectedAddress = {
         formattedAddress,
         placeId: place.id ?? prediction.placeId,
         latitude: place.location?.lat() ?? null,
         longitude: place.location?.lng() ?? null,
+        ...parsedAddress,
       };
 
       onValueChange(formattedAddress);

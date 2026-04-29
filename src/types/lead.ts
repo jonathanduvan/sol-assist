@@ -36,4 +36,7 @@ export type SelectedPropertyAddress = {
   placeId: string;
   latitude: number | null;
   longitude: number | null;
+  stateCode?: string;
+  city?: string;
+  postalCode?: string;
 };
