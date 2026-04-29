@@ -6,8 +6,8 @@ import { inferUtilityProvider } from "@/lib/solar/utility-provider";
 import { inferStateFromLeadAddress } from "@/lib/solar/state-utils";
 import { estimateSystemSize } from "@/lib/solar/system-size";
 import {
+  estimateAnnualProductionRange,
   estimateMonthlySavingsRange,
-  formatAnnualProductionRange,
 } from "@/lib/solar/savings";
 
 export function estimateSolar(input: LeadInput): SolarEstimate {
@@ -33,23 +33,35 @@ export function estimateSolar(input: LeadInput): SolarEstimate {
     utilityRatePerKwh,
   });
   
-  const annualProductionMidpoint =
-    systemSize.midpointKw * regionFactorKwhPerKw;
+  const annualProduction = estimateAnnualProductionRange({
+    minKw: systemSize.minKw,
+    maxKw: systemSize.maxKw,
+    midpointKw: systemSize.midpointKw,
+    regionFactorKwhPerKw,
+  });
 
   const savings = estimateMonthlySavingsRange({
-    annualProductionKwh: annualProductionMidpoint,
+    annualProductionKwh: annualProduction.midpointAnnualProductionKwh,
     utilityRatePerKwh,
   });
 
   return {
     solarFit: classifySolarFit(input),
+
     systemSizeRangeKw: systemSize.label,
+    systemSizeMinKw: systemSize.minKw,
+    systemSizeMaxKw: systemSize.maxKw,
+    systemSizeMidpointKw: systemSize.midpointKw,
+
     estimatedSavingsMonthly: savings.label,
-    annualProductionKwh: formatAnnualProductionRange({
-      minKw: systemSize.minKw,
-      maxKw: systemSize.maxKw,
-      regionFactorKwhPerKw,
-    }),
+    monthlySavingsMin: savings.minMonthlySavings,
+    monthlySavingsMax: savings.maxMonthlySavings,
+
+    annualProductionKwh: annualProduction.label,
+    annualProductionMinKwh: annualProduction.minAnnualProductionKwh,
+    annualProductionMaxKwh: annualProduction.maxAnnualProductionKwh,
+    annualProductionMidpointKwh: annualProduction.midpointAnnualProductionKwh,
+
     confidence: calculateConfidence(input),
     regionFactorKwhPerKw,
     utilityRatePerKwh,

@@ -4,6 +4,13 @@ export type MonthlySavingsEstimate = {
   label: string;
 };
 
+export type AnnualProductionRange = {
+  minAnnualProductionKwh: number;
+  maxAnnualProductionKwh: number;
+  midpointAnnualProductionKwh: number;
+  label: string;
+};
+
 export function estimateMonthlySavingsRange(params: {
   annualProductionKwh: number;
   utilityRatePerKwh: number;
@@ -28,17 +35,32 @@ export function estimateMonthlySavingsRange(params: {
   return {
     minMonthlySavings,
     maxMonthlySavings,
-    label: `$${minMonthlySavings}–$${maxMonthlySavings}/month`,
+    label: `$${minMonthlySavings.toLocaleString()}–$${maxMonthlySavings.toLocaleString()}/month`,
   };
 }
 
-export function formatAnnualProductionRange(params: {
+export function estimateAnnualProductionRange(params: {
   minKw: number;
   maxKw: number;
+  midpointKw: number;
   regionFactorKwhPerKw: number;
-}) {
-  const minProduction = Math.round(params.minKw * params.regionFactorKwhPerKw);
-  const maxProduction = Math.round(params.maxKw * params.regionFactorKwhPerKw);
+}): AnnualProductionRange {
+  const minAnnualProductionKwh = Math.round(
+    params.minKw * params.regionFactorKwhPerKw
+  );
 
-  return `${minProduction.toLocaleString()}–${maxProduction.toLocaleString()} kWh/year`;
+  const maxAnnualProductionKwh = Math.round(
+    params.maxKw * params.regionFactorKwhPerKw
+  );
+
+  const midpointAnnualProductionKwh = Math.round(
+    params.midpointKw * params.regionFactorKwhPerKw
+  );
+
+  return {
+    minAnnualProductionKwh,
+    maxAnnualProductionKwh,
+    midpointAnnualProductionKwh,
+    label: `${minAnnualProductionKwh.toLocaleString()}–${maxAnnualProductionKwh.toLocaleString()} kWh/year`,
+  };
 }

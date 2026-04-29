@@ -42,6 +42,7 @@ function parseAddressComponents(
   components: google.maps.places.AddressComponent[] | undefined
 ) {
   const state = getAddressComponent(components, "administrative_area_level_1");
+
   const city =
     getAddressComponent(components, "locality") ??
     getAddressComponent(components, "postal_town") ??
@@ -50,9 +51,9 @@ function parseAddressComponents(
   const postalCode = getAddressComponent(components, "postal_code");
 
   return {
-    stateCode: state?.shortText,
-    city: city?.longText,
-    postalCode: postalCode?.longText,
+    stateCode: state?.shortText ?? undefined,
+    city: city?.longText ?? undefined,
+    postalCode: postalCode?.longText ?? undefined,
   };
 }
 
@@ -91,13 +92,12 @@ export function AddressAutocomplete({
     useState<google.maps.places.AutocompleteSessionToken | null>(null);
 
   const requestIdRef = useRef(0);
-  const selectedValueRef = useRef<string | null>(null);
-
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const normalizedValue = useMemo(() => value.trim(), [value]);
 
   const canSearch =
     normalizedValue.length >= 3 &&
-    normalizedValue !== selectedValueRef.current;
+    normalizedValue !== selectedValue;
 
   useEffect(() => {
     let isActive = true;
@@ -191,7 +191,7 @@ export function AddressAutocomplete({
 
       const formattedAddress = place.formattedAddress || prediction.fullText;
 
-      selectedValueRef.current = formattedAddress;
+      setSelectedValue(formattedAddress);
 
       const parsedAddress = parseAddressComponents(place.addressComponents);
 
@@ -214,7 +214,7 @@ export function AddressAutocomplete({
   }
 
   function handleInputChange(nextValue: string) {
-    selectedValueRef.current = null;
+    setSelectedValue(null);
     onValueChange(nextValue);
     setIsDropdownOpen(nextValue.trim().length >= 3);
   }
@@ -227,7 +227,7 @@ export function AddressAutocomplete({
         onFocus={() => {
           if (
             predictions.length > 0 &&
-            normalizedValue !== selectedValueRef.current
+            normalizedValue !== selectedValue
           ) {
             setIsDropdownOpen(true);
           }
