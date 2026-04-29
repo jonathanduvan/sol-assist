@@ -25,11 +25,17 @@ export function StepRenderer({ step, lead, onUpdate, onNext }: Props) {
   switch (step) {
     case "address":
       return (
-        <AddressStep
-          value={lead.address}
-          onChange={(address) => onUpdate({ address })}
-          onNext={onNext}
-        />
+       <AddressStep
+        value={lead.address}
+        onChange={(address) => onUpdate({ address })}
+        onAddressSelect={(selectedAddress) =>
+          onUpdate({
+            address: selectedAddress.formattedAddress,
+            selectedAddress,
+          })
+        }
+        onNext={onNext}
+      />
       );
 
     case "customerType":

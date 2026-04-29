@@ -22,9 +22,18 @@ export type Timeline =
 
 export type LeadInput = {
   address: string;
+  selectedAddress?: SelectedPropertyAddress;
   customerType: CustomerType;
   billRange: BillRange;
+  monthlyBillAmount?: number;
   ownership: OwnershipStatus;
   timeline: Timeline;
   mode: QualificationMode;
+};
+
+export type SelectedPropertyAddress = {
+  formattedAddress: string;
+  placeId: string;
+  latitude: number | null;
+  longitude: number | null;
 };

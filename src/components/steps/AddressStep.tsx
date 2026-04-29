@@ -11,10 +11,16 @@ import {
 type Props = {
   value?: string;
   onChange: (value: string) => void;
+  onAddressSelect: (address: SelectedAddress) => void;
   onNext: () => void;
 };
 
-export function AddressStep({ value = "", onChange, onNext }: Props) {
+export function AddressStep({
+    value = "",
+    onChange,
+    onAddressSelect,
+    onNext,
+}: Props) {
   const [addressValue, setAddressValue] = useState(value);
   const [selectedAddress, setSelectedAddress] =
     useState<SelectedAddress | null>(null);
@@ -33,7 +39,7 @@ export function AddressStep({ value = "", onChange, onNext }: Props) {
   function handleSelect(address: SelectedAddress) {
     setSelectedAddress(address);
     setAddressValue(address.formattedAddress);
-    onChange(address.formattedAddress);
+    onAddressSelect(address);
   }
 
   return (

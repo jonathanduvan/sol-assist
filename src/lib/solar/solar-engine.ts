@@ -1,38 +1,70 @@
-import { LeadInput } from "@/types/lead";
-import { SolarEstimate } from "@/types/solar";
+import type { LeadInput } from "@/types/lead";
+import type { ConfidenceLevel, SolarEstimate, SolarFit } from "@/types/solar";
+import { REGION_PRODUCTION_FACTORS_KWH_PER_KW_YEAR } from "@/lib/solar/data/region-solassist";
+import { UTILITY_RATE_ASSUMPTIONS_PER_KWH } from "@/lib/solar/data/utility-rate-solassist";
+import { inferStateFromAddress } from "@/lib/solar/state-utils";
+import { estimateSystemSize } from "@/lib/solar/system-size";
+import {
+  estimateMonthlySavingsRange,
+  formatAnnualProductionRange,
+} from "@/lib/solar/savings";
 
-export function estimateSolar(
- input: LeadInput
-): SolarEstimate {
+export function estimateSolar(input: LeadInput): SolarEstimate {
+  const state = inferStateFromAddress(input.address);
 
- let systemSize="4–6 kW";
- let savings="$40–90/month";
- let annual="6,000–9,000 kWh/year";
+  const regionFactorKwhPerKw =
+    REGION_PRODUCTION_FACTORS_KWH_PER_KW_YEAR[state];
 
- if (input.billRange==="150-250") {
-   systemSize="6–9 kW";
-   savings="$80–140/month";
-   annual="9,000–13,500 kWh/year";
- }
+  const utilityRatePerKwh = UTILITY_RATE_ASSUMPTIONS_PER_KWH[state];
 
- if (input.billRange==="250-plus") {
-   systemSize="8–12 kW";
-   savings="$120–180/month";
-   annual="12,000–18,000 kWh/year";
- }
+  const systemSize = estimateSystemSize({
+    billRange: input.billRange,
+    monthlyBillAmount: input.monthlyBillAmount,
+    utilityRatePerKwh,
+  });
+  
+  const annualProductionMidpoint =
+    systemSize.midpointKw * regionFactorKwhPerKw;
 
- return {
-   solarFit:
-     input.ownership==="owner"
-      ? "Strong"
-      : "Limited",
+  const savings = estimateMonthlySavingsRange({
+    annualProductionKwh: annualProductionMidpoint,
+    utilityRatePerKwh,
+  });
 
-   systemSizeRangeKw: systemSize,
+  return {
+    solarFit: classifySolarFit(input),
+    systemSizeRangeKw: systemSize.label,
+    estimatedSavingsMonthly: savings.label,
+    annualProductionKwh: formatAnnualProductionRange({
+      minKw: systemSize.minKw,
+      maxKw: systemSize.maxKw,
+      regionFactorKwhPerKw,
+    }),
+    confidence: calculateConfidence(input),
+    regionFactorKwhPerKw,
+    utilityRatePerKwh,
+  };
+}
 
-   estimatedSavingsMonthly: savings,
+function classifySolarFit(input: LeadInput): SolarFit {
+  if (input.ownership !== "owner") return "limited";
 
-   annualProductionKwh: annual,
+  if (input.billRange === "250-plus" || input.billRange === "150-250") {
+    return "strong";
+  }
 
-   confidence: "Medium"
- };
+  return "moderate";
+}
+
+function calculateConfidence(input: LeadInput): ConfidenceLevel {
+  if (
+    input.selectedAddress?.latitude &&
+    input.selectedAddress?.longitude &&
+    input.address &&
+    input.billRange
+  ) {
+    return "medium";
+  }
+
+  return "low";
 }

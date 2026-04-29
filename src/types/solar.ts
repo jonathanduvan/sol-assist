@@ -1,7 +1,12 @@
+export type SolarFit = "strong" | "moderate" | "limited";
+export type ConfidenceLevel = "high" | "medium" | "low";
+
 export type SolarEstimate = {
-  solarFit: string;
+  solarFit: SolarFit;
   systemSizeRangeKw: string;
   estimatedSavingsMonthly: string;
   annualProductionKwh: string;
-  confidence: string;
+  confidence: ConfidenceLevel;
+  regionFactorKwhPerKw: number;
+  utilityRatePerKwh: number;
 };

@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { LeadInput } from "@/types/lead";
 import type { SolarEstimate } from "@/types/solar";
 import { ResultMetricCard } from "./ResultMetricCard";
+import Link from "next/link";
 
 type Props = {
   lead: LeadInput;
@@ -13,29 +13,18 @@ type Props = {
   score: number;
 };
 
+function formatPercentLabel(value: number) {
+  return `${Math.round(value * 100)}¢/kWh`;
+}
+
 export function ResultsScreen({ lead, estimate, score }: Props) {
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
-
-  async function saveLead() {
-    setSaveStatus("saving");
-
-    const response = await fetch("/api/leads", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        ...lead,
-        score,
-        solarFit: estimate.solarFit,
-        estimatedSavingsMonthly: estimate.estimatedSavingsMonthly,
-        systemSizeRangeKw: estimate.systemSizeRangeKw,
-        annualProductionKwh: estimate.annualProductionKwh,
-      }),
-    });
-
-    setSaveStatus(response.ok ? "saved" : "error");
-  }
+  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL;
+  const fitLabel =
+    estimate.solarFit === "strong"
+      ? "strong"
+      : estimate.solarFit === "moderate"
+        ? "moderate"
+        : "limited";
 
   return (
     <Card className="mx-auto w-full max-w-3xl rounded-2xl">
@@ -46,45 +35,81 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
           </p>
 
           <h1 className="mt-2 text-4xl font-semibold tracking-tight">
-            This property looks like a {estimate.solarFit} solar candidate.
+            This property looks like a {fitLabel} solar candidate.
           </h1>
 
           <p className="mt-4 text-muted-foreground">
-            These numbers are a quick estimate based on your inputs. A final proposal requires a full design and utility review.
+            Estimate for {lead.address}. These numbers are based on your inputs,
+            typical local production, and assumed local energy rates.
           </p>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <ResultMetricCard label="Estimated Savings" value={estimate.estimatedSavingsMonthly} />
-          <ResultMetricCard label="System Size" value={estimate.systemSizeRangeKw} />
-          <ResultMetricCard label="Annual Production" value={estimate.annualProductionKwh} />
+          <ResultMetricCard
+            label="Estimated Savings"
+            value={estimate.estimatedSavingsMonthly}
+          />
+
+          <ResultMetricCard
+            label="System Size"
+            value={estimate.systemSizeRangeKw}
+          />
+
+          <ResultMetricCard
+            label="Annual Production"
+            value={estimate.annualProductionKwh}
+          />
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <ResultMetricCard
+            label="Confidence"
+            value={estimate.confidence}
+          />
+
+          <ResultMetricCard
+            label="Assumed Rate"
+            value={formatPercentLabel(estimate.utilityRatePerKwh)}
+          />
+
+          <ResultMetricCard
+            label="Production Factor"
+            value={`${estimate.regionFactorKwhPerKw} kWh/kW/yr`}
+          />
         </div>
 
         <Card className="rounded-2xl bg-muted">
-          <CardContent className="p-4 text-sm text-muted-foreground">
-            Estimates are based on typical solar production and local energy rate assumptions. Final system design and savings will vary.
+          <CardContent className="space-y-2 p-4 text-sm text-muted-foreground">
+            <p>
+              Estimates are preliminary and based on typical solar production,
+              local rate assumptions, and your provided bill range.
+            </p>
+            <p>
+              Final system design and savings will vary after roof review,
+              utility review, shading analysis, and financing selection.
+            </p>
           </CardContent>
         </Card>
 
         <div className="flex flex-col gap-3 sm:flex-row">
-          <Button size="lg" className="rounded-xl" onClick={saveLead} disabled={saveStatus === "saving" || saveStatus === "saved"}>
-            {saveStatus === "saving"
-              ? "Saving..."
-              : saveStatus === "saved"
-                ? "Lead Saved"
-                : "Save Lead"}
-          </Button>
-
+          {bookingUrl ? (
+            <Button size="lg" className="rounded-xl" asChild>
+              <Link href={bookingUrl} target="_blank" rel="noreferrer">
+                Book Free Solar Call
+              </Link>
+            </Button>
+          ) : (
+            <Button size="lg" className="rounded-xl" disabled>
+              Booking Link Not Set
+            </Button>
+          )}
           <Button size="lg" variant="outline" className="rounded-xl">
             Lead Score: {score}
           </Button>
-        </div>
-
-        {saveStatus === "error" && (
-          <p className="text-sm text-red-600">
-            Could not save this lead. Check your Notion settings and database fields.
+          <p className="text-sm text-muted-foreground">
+            Your custom design will verify roof space, utility rates, incentives, and final savings.
           </p>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
