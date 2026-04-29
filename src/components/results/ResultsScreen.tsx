@@ -25,6 +25,9 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
       : estimate.solarFit === "moderate"
         ? "moderate"
         : "limited";
+  const billLabel = lead.monthlyBillAmount
+  ? `$${lead.monthlyBillAmount}/month`
+  : lead.billRange;
 
   return (
     <Card className="mx-auto w-full max-w-3xl rounded-2xl">
@@ -39,12 +42,12 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
           </h1>
 
           <p className="mt-4 text-muted-foreground">
-            Estimate for {lead.address}. These numbers are based on your inputs,
-            typical local production, and assumed local energy rates.
+            Estimate for {lead.address}. These numbers are based on your address, 
+            electric bill, typical regional production, and assumed local energy rates.
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <ResultMetricCard
             label="Estimated Savings"
             value={estimate.estimatedSavingsMonthly}
@@ -58,6 +61,11 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
           <ResultMetricCard
             label="Annual Production"
             value={estimate.annualProductionKwh}
+          />
+
+          <ResultMetricCard
+            label="Electric Bill"
+            value={billLabel}
           />
         </div>
 
@@ -76,6 +84,7 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
             label="Production Factor"
             value={`${estimate.regionFactorKwhPerKw} kWh/kW/yr`}
           />
+
         </div>
 
         <Card className="rounded-2xl bg-muted">
