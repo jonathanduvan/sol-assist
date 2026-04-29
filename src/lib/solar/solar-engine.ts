@@ -1,7 +1,8 @@
 import type { LeadInput } from "@/types/lead";
 import type { ConfidenceLevel, SolarEstimate, SolarFit } from "@/types/solar";
 import { REGION_PRODUCTION_FACTORS_KWH_PER_KW_YEAR } from "@/lib/solar/data/region-solassist";
-import { UTILITY_RATE_ASSUMPTIONS_PER_KWH } from "@/lib/solar/data/utility-rate-solassist";
+import { PROVIDER_UTILITY_RATE_ASSUMPTIONS_PER_KWH } from "@/lib/solar/data/utility-rate-solassist";
+import { inferUtilityProvider } from "@/lib/solar/utility-provider";
 import { inferStateFromAddress } from "@/lib/solar/state-utils";
 import { estimateSystemSize } from "@/lib/solar/system-size";
 import {
@@ -15,8 +16,14 @@ export function estimateSolar(input: LeadInput): SolarEstimate {
   const regionFactorKwhPerKw =
     REGION_PRODUCTION_FACTORS_KWH_PER_KW_YEAR[state];
 
-  const utilityRatePerKwh = UTILITY_RATE_ASSUMPTIONS_PER_KWH[state];
+  const utilityProvider = inferUtilityProvider({
+    state,
+    address: input.address,
+  });
 
+  const utilityRatePerKwh =
+    PROVIDER_UTILITY_RATE_ASSUMPTIONS_PER_KWH[utilityProvider];
+    
   const systemSize = estimateSystemSize({
     billRange: input.billRange,
     monthlyBillAmount: input.monthlyBillAmount,
@@ -43,6 +50,7 @@ export function estimateSolar(input: LeadInput): SolarEstimate {
     confidence: calculateConfidence(input),
     regionFactorKwhPerKw,
     utilityRatePerKwh,
+    utilityProvider,
   };
 }
 

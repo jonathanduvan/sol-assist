@@ -9,4 +9,12 @@ export type SolarEstimate = {
   confidence: ConfidenceLevel;
   regionFactorKwhPerKw: number;
   utilityRatePerKwh: number;
+  utilityProvider: UtilityProvider;
 };
+
+export type UtilityProvider =
+  | "fpl"
+  | "duke-energy"
+  | "georgia-power"
+  | "state-default"
+  | "unknown";

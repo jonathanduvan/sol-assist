@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import type { LeadInput } from "@/types/lead";
 import type { SolarEstimate } from "@/types/solar";
 import { ResultMetricCard } from "./ResultMetricCard";
+import { formatUtilityProvider } from "@/lib/solar/utility-provider";
 import Link from "next/link";
 
 type Props = {
@@ -69,7 +70,7 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
           />
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-4">
           <ResultMetricCard
             label="Confidence"
             value={estimate.confidence}
@@ -78,6 +79,10 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
           <ResultMetricCard
             label="Assumed Rate"
             value={formatPercentLabel(estimate.utilityRatePerKwh)}
+          />
+          <ResultMetricCard
+            label="Utility Estimate"
+            value={formatUtilityProvider(estimate.utilityProvider)}
           />
 
           <ResultMetricCard
