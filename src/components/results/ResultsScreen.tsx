@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight, CheckCircle2, Info, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CheckCircle2, Info, Sun } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
