@@ -1,5 +1,4 @@
 import type { SolarEstimate } from "@/types/solar";
-import { Card, CardContent } from "@/components/ui/card";
 
 type Props = {
   estimate: SolarEstimate;
@@ -7,62 +6,46 @@ type Props = {
 
 export function CalculationBreakdown({ estimate }: Props) {
   return (
-    <Card className="rounded-2xl bg-muted/50">
-      <CardContent className="space-y-3 p-5 text-sm text-muted-foreground">
-        <p className="font-medium text-foreground">
-          How this estimate was calculated
+    <div className="space-y-4 text-sm text-muted-foreground">
+      <div className="space-y-2">
+        <p>
+          This is a preliminary estimate based on the property address, your
+          electric bill, typical solar production in your region, and assumed
+          local utility rates.
         </p>
 
         <p>
-          We estimate system size from your electric bill, then estimate annual
-          production using a regional solar production factor.
+          We first estimate how much electricity your bill represents, then size
+          a system intended to offset at least 85% of that usage. From there, we
+          estimate annual production and convert that energy into potential
+          monthly savings.
         </p>
+      </div>
 
-        <div className="grid gap-2 sm:grid-cols-2">
-          <p>
-            Production factor:{" "}
-            <span className="font-medium text-foreground">
-              {estimate.regionFactorKwhPerKw} kWh/kW/year
-            </span>
-          </p>
+      <div className="grid gap-3 rounded-2xl border bg-muted/40 p-4 sm:grid-cols-2">
+        <Detail label="Production factor" value={`${estimate.regionFactorKwhPerKw} kWh/kW/year`} />
+        <Detail label="Assumed utility rate" value={`${Math.round(estimate.utilityRatePerKwh * 100)}¢/kWh`} />
+        <Detail label="Utility increase" value={`${Math.round(estimate.utilityEscalationRate * 100)}%/year`} />
+        <Detail label="Solar rate assumption" value={`${Math.round(estimate.solarRatePerKwh * 1000) / 10}¢/kWh`} />
+        <Detail label="Solar rate increase" value={`${Math.round(estimate.solarEscalationRate * 1000) / 10}%/year`} />
+        <Detail label="Confidence" value={estimate.confidence} />
+      </div>
 
-          <p>
-            Assumed utility rate:{" "}
-            <span className="font-medium text-foreground">
-              {Math.round(estimate.utilityRatePerKwh * 100)}¢/kWh
-            </span>
-          </p>
+      <p>
+        Final savings depend on roof layout, shading, utility rules, equipment,
+        system design, financing terms, solar rate, and contract structure.
+      </p>
+    </div>
+  );
+}
 
-          <p>
-            Utility increase:{" "}
-            <span className="font-medium text-foreground">
-              {Math.round(estimate.utilityEscalationRate * 100)}%/year
-            </span>
-          </p>
-
-          <p>
-            Confidence:{" "}
-            <span className="font-medium text-foreground">
-              {estimate.confidence}
-            </span>
-          </p>
-
-          <p>
-            Estimate type:{" "}
-            <span className="font-medium text-foreground">
-              Preliminary
-            </span>
-          </p>
-        </div>
-        <p>
-          The 10-year value estimate applies an assumed annual utility increase to the
-          value of energy the system is expected to produce.
-        </p>
-        <p>
-          Final savings depend on roof layout, shading, utility rules, equipment,
-          system design, and financing terms.
-        </p>
-      </CardContent>
-    </Card>
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="font-medium text-foreground">{value}</p>
+    </div>
   );
 }
