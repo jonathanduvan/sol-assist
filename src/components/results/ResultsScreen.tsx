@@ -1,6 +1,8 @@
 "use client";
 
-import { CheckCircle2, Info, Sun } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, CheckCircle2, Info, Sun } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
@@ -11,6 +13,7 @@ import {
 import type { LeadInput } from "@/types/lead";
 import type { SolarEstimate } from "@/types/solar";
 import { formatUtilityProvider } from "@/lib/solar/utility-provider";
+import { usePvWattsEstimate } from "@/hooks/use-pvwatts-estimate";
 import { CalculationBreakdown } from "./CalculationBreakdown";
 import { LeadCaptureBooking } from "./LeadCaptureBooking";
 import { PvWattsValidation } from "./PvWattsValidation";
@@ -48,14 +51,23 @@ function getFitDescription(fit: SolarEstimate["solarFit"]) {
 }
 
 export function ResultsScreen({ lead, estimate, score }: Props) {
-  const bookingUrl = process.env.NEXT_PUBLIC_BOOKING_URL;
-
   const billLabel = lead.monthlyBillAmount
     ? `$${lead.monthlyBillAmount.toLocaleString()}/month`
     : lead.billRange;
 
   const fitHeadline = getFitHeadline(estimate.solarFit);
   const fitDescription = getFitDescription(estimate.solarFit);
+
+  const pvWattsEstimate = usePvWattsEstimate({ lead, estimate });
+
+  const displayedSavings =
+    pvWattsEstimate.estimatedSavingsMonthly ?? estimate.estimatedSavingsMonthly;
+
+  const displayedAnnualProduction = pvWattsEstimate.annualProductionKwh
+    ? `${pvWattsEstimate.annualProductionKwh.toLocaleString()} kWh/year`
+    : estimate.annualProductionKwh;
+
+  const confidenceLabel = pvWattsEstimate.confidenceLabel;
 
   return (
     <Card className="mx-auto w-full max-w-3xl rounded-3xl">
@@ -83,7 +95,7 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
         <section className="grid gap-4 md:grid-cols-3">
           <PrimaryMetric
             label="Estimated Monthly Savings"
-            value={estimate.estimatedSavingsMonthly}
+            value={displayedSavings}
             helper="Based on estimated solar production"
             featured
           />
@@ -96,10 +108,22 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
 
           <PrimaryMetric
             label="Annual Production"
-            value={estimate.annualProductionKwh}
+            value={displayedAnnualProduction}
             helper="Estimated yearly output"
           />
         </section>
+
+        {pvWattsEstimate.status === "loading" && (
+          <p className="text-center text-sm text-muted-foreground">
+            Refining production estimate with NREL PVWatts...
+          </p>
+        )}
+
+        {pvWattsEstimate.status === "ready" && (
+          <p className="text-center text-sm text-muted-foreground">
+            Production estimate adjusted using NREL PVWatts for this location.
+          </p>
+        )}
 
         <section className="rounded-2xl border bg-muted/40 p-5">
           <div className="flex gap-3">
@@ -107,8 +131,8 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
             <div className="space-y-1">
               <p className="font-medium">Recommended next step</p>
               <p className="text-sm text-muted-foreground">
-                Get a custom solar design to verify roof space, shade, utility rules,
-                incentives, equipment options, and final savings.
+                Get a custom solar design to verify roof space, shade, utility
+                rules, incentives, equipment options, and final savings.
               </p>
             </div>
           </div>
@@ -137,6 +161,10 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
                   <SecondaryMetric
                     label="Assumed Rate"
                     value={formatRate(estimate.utilityRatePerKwh)}
+                  />
+                  <SecondaryMetric
+                    label="Confidence"
+                    value={confidenceLabel}
                   />
                   <SecondaryMetric
                     label="First-Year Energy Value"
