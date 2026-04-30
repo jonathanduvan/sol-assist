@@ -14,6 +14,7 @@ import type { LeadInput } from "@/types/lead";
 import type { SolarEstimate } from "@/types/solar";
 import { formatUtilityProvider } from "@/lib/solar/utility-provider";
 import { CalculationBreakdown } from "./CalculationBreakdown";
+import { LeadCaptureBooking } from "./LeadCaptureBooking";
 
 type Props = {
   lead: LeadInput;
@@ -107,31 +108,14 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
             <div className="space-y-1">
               <p className="font-medium">Recommended next step</p>
               <p className="text-sm text-muted-foreground">
-                Get a custom solar design to verify roof space, shade, utility
-                rules, incentives, equipment options, and final savings.
+                Get a custom solar design to verify roof space, shade, utility rules,
+                incentives, equipment options, and final savings.
               </p>
             </div>
           </div>
-
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            {bookingUrl ? (
-              <Button size="lg" className="rounded-xl" asChild>
-                <Link href={bookingUrl} target="_blank" rel="noreferrer">
-                  Book Free Solar Call
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            ) : (
-              <Button size="lg" className="rounded-xl" disabled>
-                Booking Link Not Set
-              </Button>
-            )}
-
-            <Button size="lg" variant="outline" className="rounded-xl">
-              Lead Score: {score}
-            </Button>
-          </div>
         </section>
+
+        <LeadCaptureBooking lead={lead} estimate={estimate} score={score} />
 
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="details">
