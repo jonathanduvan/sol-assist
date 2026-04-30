@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowRight, CheckCircle2, Info, Sun } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CheckCircle2, Info, Sun } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
@@ -15,6 +13,7 @@ import type { SolarEstimate } from "@/types/solar";
 import { formatUtilityProvider } from "@/lib/solar/utility-provider";
 import { CalculationBreakdown } from "./CalculationBreakdown";
 import { LeadCaptureBooking } from "./LeadCaptureBooking";
+import { PvWattsValidation } from "./PvWattsValidation";
 
 type Props = {
   lead: LeadInput;
@@ -158,6 +157,8 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
                     )}
                   />
                 </div>
+
+                <PvWattsValidation lead={lead} estimate={estimate} />
 
                 <CalculationBreakdown estimate={estimate} />
               </div>

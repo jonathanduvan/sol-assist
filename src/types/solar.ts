@@ -40,3 +40,10 @@ export type SolarEstimate = {
   tenYearSolarCost: number;
   tenYearEstimatedSavingsVsUtility: number;
 };
+
+export type ExternalSolarEstimate = {
+  pvWattsAnnualProductionKwh: number | null;
+  pvWattsMonthlyProductionKwh: number[];
+  pvWattsCapacityFactor: number | null;
+  pvWattsAvailable: boolean;
+};
