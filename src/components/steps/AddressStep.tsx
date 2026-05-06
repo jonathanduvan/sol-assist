@@ -28,18 +28,16 @@ export function AddressStep({
   }
 
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-      <section className="space-y-8">
-        <div className="inline-flex items-center gap-2 rounded-full border bg-card/70 px-4 py-2 text-sm text-muted-foreground shadow-sm backdrop-blur">
-          <SunMedium className="h-4 w-4 text-primary" />
-          Solar qualification powered by Sol Assist
-        </div>
-
+    <div className="mx-auto flex w-full max-w-4xl flex-col">
+      <section className="w-full space-y-8">
         <div className="space-y-5">
           <div className="space-y-3">
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">
-              Sol Assist × Skyward Solar LLC
-            </p>
+            <div className="inline-flex items-center gap-2 rounded-full border bg-card/70 px-4 py-2 text-sm text-muted-foreground shadow-sm backdrop-blur">
+              <p className="text-sm font-medium uppercase tracking-[0.2em] text-primary">
+                Sol Assist × Skyward Solar LLC
+              </p>
+              <SunMedium className="h-4 w-4 text-primary" />
+            </div>
 
             <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
               See if your property is a strong solar candidate.
@@ -106,7 +104,7 @@ export function AddressStep({
         </div>
       </section>
 
-      <aside className="rounded-3xl border bg-card/70 p-6 shadow-sm backdrop-blur">
+      {/* <aside className="rounded-3xl border bg-card/70 p-6 shadow-sm backdrop-blur">
         <div className="space-y-6">
           <div className="flex items-center justify-between border-b pb-5">
             <div>
@@ -143,7 +141,7 @@ export function AddressStep({
             </p>
           </div>
         </div>
-      </aside>
+      </aside> */}
     </div>
   );
 }
