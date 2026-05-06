@@ -1,16 +1,22 @@
 import { Client } from "@notionhq/client";
-import type { LeadPayload } from "@/lib/validation/lead-schema";
+import type { LeadCapturePayload } from "@/lib/validation/lead-capture-schema";
 
 const notion = new Client({
   auth: process.env.NOTION_API_KEY,
 });
 
-export async function saveLeadToNotion(lead: LeadPayload) {
+function optionalText(value?: string) {
+  return value?.trim() || "";
+}
+
+export async function saveLeadToNotion(payload: LeadCapturePayload) {
   const databaseId = process.env.NOTION_LEADS_DATABASE_ID;
 
   if (!databaseId) {
     throw new Error("Missing NOTION_LEADS_DATABASE_ID");
   }
+
+  const fullName = `${payload.firstName} ${payload.lastName ?? ""}`.trim();
 
   return notion.pages.create({
     parent: {
@@ -21,83 +27,163 @@ export async function saveLeadToNotion(lead: LeadPayload) {
         title: [
           {
             text: {
-              content: lead.address,
+              content: fullName || "New Sol Assist Lead",
             },
           },
         ],
       },
+
+      Company: {
+        rich_text: [
+          {
+            text: {
+              content: optionalText(payload.companyName),
+            },
+          },
+        ],
+      },
+
+      Email: {
+        email: payload.email,
+      },
+
+      Phone: {
+        phone_number: optionalText(payload.phone) || null,
+      },
+
       Address: {
         rich_text: [
           {
             text: {
-              content: lead.address,
+              content: payload.lead.address,
             },
           },
         ],
       },
+
       "Customer Type": {
         select: {
-          name: lead.customerType,
+          name: payload.lead.customerType,
         },
       },
-      "Electric Bill": {
+
+      "Property Type": {
         select: {
-          name: lead.billRange,
+          name: payload.lead.commercialPropertyType ?? "N/A",
         },
       },
+
+      "Monthly Bill": {
+        number: payload.lead.monthlyBillAmount ?? null,
+      },
+
+      "Bill Range": {
+        select: {
+          name: payload.lead.billRange,
+        },
+      },
+
       Ownership: {
         select: {
-          name: lead.ownership,
+          name: payload.lead.ownership,
         },
       },
+
       Timeline: {
         select: {
-          name: lead.timeline,
+          name: payload.lead.timeline,
         },
       },
-      Mode: {
-        select: {
-          name: lead.mode,
-        },
-      },
-      "Lead Score": {
-        number: lead.score,
-      },
+
       "Solar Fit": {
         select: {
-          name: lead.solarFit,
+          name: payload.estimate.solarFit,
         },
       },
+
+      "Lead Score": {
+        number: payload.score,
+      },
+
       "Estimated Savings": {
         rich_text: [
           {
             text: {
-              content: lead.estimatedSavingsMonthly,
+              content: payload.estimate.estimatedSavingsMonthly,
             },
           },
         ],
       },
+
+      "Annual Savings": {
+        rich_text: [
+          {
+            text: {
+              content: payload.estimate.annualSavingsLabel,
+            },
+          },
+        ],
+      },
+
       "System Size": {
         rich_text: [
           {
             text: {
-              content: lead.systemSizeRangeKw,
+              content: payload.estimate.systemSizeRangeKw,
             },
           },
         ],
       },
+
       "Annual Production": {
         rich_text: [
           {
             text: {
-              content: lead.annualProductionKwh,
+              content: payload.estimate.annualProductionKwh,
             },
           },
         ],
       },
+
+      "Payback Period": {
+        rich_text: [
+          {
+            text: {
+              content: payload.estimate.estimatedPaybackLabel,
+            },
+          },
+        ],
+      },
+
+      "Federal Tax Credit": {
+        rich_text: [
+          {
+            text: {
+              content: payload.estimate.estimatedFederalTaxCreditLabel,
+            },
+          },
+        ],
+      },
+
+      "Utility Provider": {
+        rich_text: [
+          {
+            text: {
+              content: payload.estimate.utilityProvider,
+            },
+          },
+        ],
+      },
+
       Status: {
-        select: {
-          name: "new",
+        status: {
+          name: "New",
+        },
+      },
+
+      "Created At": {
+        date: {
+          start: new Date().toISOString(),
         },
       },
     },

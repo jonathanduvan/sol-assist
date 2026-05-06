@@ -42,6 +42,13 @@ export type LeadInput = {
 export type SelectedPropertyAddress = {
   formattedAddress: string;
   placeId: string;
+  firstName?: string;
+  lastName?: string;
+
+  email?: string;
+  phone?: string;
+
+  companyName?: string;
   latitude: number | null;
   longitude: number | null;
   stateCode?: string;

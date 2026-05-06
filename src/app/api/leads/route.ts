@@ -1,28 +1,24 @@
 import { NextResponse } from "next/server";
-import { leadSchema } from "@/lib/validation/lead-schema";
+import { leadCaptureSchema } from "@/lib/validation/lead-capture-schema";
 import { saveLeadToNotion } from "@/lib/notion/save-lead";
 
 export async function POST(request: Request) {
   try {
     const json = await request.json();
-    const lead = leadSchema.parse(json);
+    const payload = leadCaptureSchema.parse(json);
 
-    await saveLeadToNotion(lead);
+    await saveLeadToNotion(payload);
 
-    return NextResponse.json({
-      ok: true,
-    });
+    return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error("Failed to save lead", error);
+    console.error("Lead save failed", error);
 
     return NextResponse.json(
       {
         ok: false,
-        error: "Failed to save lead",
+        error: "Lead save failed",
       },
-      {
-        status: 400,
-      }
+      { status: 500 }
     );
   }
 }
