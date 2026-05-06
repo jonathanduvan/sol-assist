@@ -19,16 +19,32 @@ export function LeadCaptureBooking({ lead, estimate, score }: Props) {
 
   const [showBooking, setShowBooking] = useState(false);
 
+  const isCommercial = lead.customerType === "commercial";
+
+  const title = isCommercial
+    ? "Review your commercial solar investment plan"
+    : "Get your custom solar design";
+
+  const description = isCommercial
+    ? "Choose a time to review projected savings, tax incentives, system size, and payback period."
+    : "Choose a time to review your property, savings estimate, and best next steps.";
+
+  const bookingTitle = isCommercial
+    ? "Choose a time for your commercial solar review"
+    : "Choose a time";
+
+  const bookingDescription = isCommercial
+    ? "We’ll review roof potential, utility costs, available incentives, financing options, and projected ROI."
+    : "Book a free call to verify roof space, utility details, and final savings.";
+
   return (
     <Card className="rounded-2xl border bg-card">
       <CardContent className="space-y-5 p-5">
         {!showBooking ? (
           <>
             <div className="space-y-1">
-              <p className="font-medium">Get your custom solar design</p>
-              <p className="text-sm text-muted-foreground">
-                Choose a time to review your property, savings estimate, and best next steps.
-              </p>
+              <p className="font-medium">{title}</p>
+              <p className="text-sm text-muted-foreground">{description}</p>
             </div>
 
             <Button
@@ -36,7 +52,7 @@ export function LeadCaptureBooking({ lead, estimate, score }: Props) {
               className="w-full rounded-xl"
               onClick={() => setShowBooking(true)}
             >
-              Continue to Booking
+              {isCommercial ? "Schedule ROI Review" : "Continue to Booking"}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </>
@@ -45,9 +61,9 @@ export function LeadCaptureBooking({ lead, estimate, score }: Props) {
             <div className="flex items-start gap-3 rounded-2xl bg-muted p-4">
               <CalendarDays className="mt-0.5 h-5 w-5 shrink-0" />
               <div>
-                <p className="font-medium">Choose a time</p>
+                <p className="font-medium">{bookingTitle}</p>
                 <p className="text-sm text-muted-foreground">
-                  Book a free call to verify roof space, utility details, and final savings.
+                  {bookingDescription}
                 </p>
               </div>
             </div>
