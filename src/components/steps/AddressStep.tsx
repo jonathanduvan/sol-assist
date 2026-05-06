@@ -1,8 +1,7 @@
 "use client";
 
-import { ArrowRight, BadgeCheck, Building2, Handshake, Home, SunMedium, Zap } from "lucide-react";
+import { ArrowRight, BadgeCheck, Building2, Home, SunMedium, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   AddressAutocomplete,
   type SelectedAddress,
@@ -51,7 +50,7 @@ export function AddressStep({
           </p>
           <p className="max-w-2xl text-sm text-muted-foreground">
             <a
-              href="https://skywardsolar.com"
+              href="https://www.skyward.solar/"
               target="_blank"
               rel="noreferrer"
               className="font-medium text-primary hover:underline"
