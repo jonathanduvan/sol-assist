@@ -6,10 +6,12 @@ import { CustomerTypeStep } from "@/components/steps/CustomerTypeStep";
 import { BillStep } from "@/components/steps/BillStep";
 import { OwnershipStep } from "@/components/steps/OwnershipStep";
 import { TimelineStep } from "@/components/steps/TimelineStep";
+import { CommercialPropertyTypeStep } from "@/components/steps/CommercialPropertyTypeStep";
 
 export type FunnelStep =
   | "address"
   | "customerType"
+  | "commercialPropertyType"
   | "bill"
   | "ownership"
   | "timeline";
@@ -47,6 +49,16 @@ export function StepRenderer({ step, lead, onUpdate, onNext }: Props) {
           }}
         />
       );
+    
+    case "commercialPropertyType":
+    return (
+      <CommercialPropertyTypeStep
+        onSelect={(commercialPropertyType) => {
+          onUpdate({ commercialPropertyType });
+          onNext();
+        }}
+      />
+    );
 
     case "bill":
       return (

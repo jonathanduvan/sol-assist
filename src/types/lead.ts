@@ -20,6 +20,13 @@ export type Timeline =
   | "1-3-months"
   | "exploring";
 
+export type CommercialPropertyType =
+  | "warehouse-industrial"
+  | "retail-restaurant"
+  | "office-medical"
+  | "hotel-multifamily"
+  | "other-commercial";
+
 export type LeadInput = {
   address: string;
   selectedAddress?: SelectedPropertyAddress;
@@ -29,6 +36,7 @@ export type LeadInput = {
   ownership: OwnershipStatus;
   timeline: Timeline;
   mode: QualificationMode;
+  commercialPropertyType?: CommercialPropertyType;
 };
 
 export type SelectedPropertyAddress = {

@@ -18,6 +18,7 @@ import {
 } from "@/lib/solar/savings";
 import { projectUtilityValue } from "@/lib/solar/escalation";
 import { projectSolarRateCost } from "@/lib/solar/solar-rate";
+import { estimateCommercialFinancials } from "@/lib/solar/commercial-financials";
 
 
 export function estimateSolar(input: LeadInput): SolarEstimate {
@@ -68,6 +69,13 @@ export function estimateSolar(input: LeadInput): SolarEstimate {
     utilityRatePerKwh,
   });
 
+  const commercialFinancials = estimateCommercialFinancials({
+    systemSizeMinKw: systemSize.minKw,
+    systemSizeMaxKw: systemSize.maxKw,
+    monthlySavingsMin: savings.minMonthlySavings,
+    monthlySavingsMax: savings.maxMonthlySavings,
+  });
+
   return {
     solarFit: classifySolarFit(input),
 
@@ -103,6 +111,29 @@ export function estimateSolar(input: LeadInput): SolarEstimate {
     tenYearSolarCost: solarRateProjection.tenYearSolarCost,
     tenYearEstimatedSavingsVsUtility:
     utilityProjection.projectedUtilityValue - solarRateProjection.tenYearSolarCost,
+
+    // Commercial
+    annualSavingsMin: commercialFinancials.annualSavingsMin,
+    annualSavingsMax: commercialFinancials.annualSavingsMax,
+    annualSavingsLabel: commercialFinancials.annualSavingsLabel,
+
+    estimatedSystemCostMin: commercialFinancials.estimatedSystemCostMin,
+    estimatedSystemCostMax: commercialFinancials.estimatedSystemCostMax,
+    estimatedSystemCostLabel: commercialFinancials.estimatedSystemCostLabel,
+
+    federalTaxCreditRate: commercialFinancials.federalTaxCreditRate,
+    estimatedFederalTaxCreditMin:
+      commercialFinancials.estimatedFederalTaxCreditMin,
+    estimatedFederalTaxCreditMax:
+      commercialFinancials.estimatedFederalTaxCreditMax,
+    estimatedFederalTaxCreditLabel:
+      commercialFinancials.estimatedFederalTaxCreditLabel,
+
+    estimatedPaybackYearsMin:
+      commercialFinancials.estimatedPaybackYearsMin,
+    estimatedPaybackYearsMax:
+      commercialFinancials.estimatedPaybackYearsMax,
+    estimatedPaybackLabel: commercialFinancials.estimatedPaybackLabel,
     
   };
 }

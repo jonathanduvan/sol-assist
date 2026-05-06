@@ -67,6 +67,8 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
 
   const confidenceLabel = pvWattsEstimate.confidenceLabel;
 
+  const isCommercial = lead.customerType === "commercial";
+
   return (
     <Card className="mx-auto w-full max-w-3xl rounded-3xl">
       <CardContent className="space-y-8 p-6 md:p-8">
@@ -91,24 +93,49 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
         </section>
 
         <section className="grid gap-4 md:grid-cols-3">
-          <PrimaryMetric
-            label="Estimated Monthly Savings"
-            value={displayedSavings}
-            helper="Based on estimated solar production"
-            featured
-          />
+          {isCommercial ? (
+            <>
+              <PrimaryMetric
+                label="Estimated Annual Savings"
+                value={estimate.annualSavingsLabel}
+                helper="Potential yearly energy cost reduction"
+                featured
+              />
 
-          <PrimaryMetric
-            label="Estimated System Size"
-            value={estimate.systemSizeRangeKw}
-            helper="Preliminary design range"
-          />
+              <PrimaryMetric
+                label="Estimated Payback"
+                value={estimate.estimatedPaybackLabel}
+                helper="After estimated federal tax credit"
+              />
 
-          <PrimaryMetric
-            label="Annual Production"
-            value={displayedAnnualProduction}
-            helper="Estimated yearly output"
-          />
+              <PrimaryMetric
+                label="Federal Tax Credit"
+                value={estimate.estimatedFederalTaxCreditLabel}
+                helper="Based on 30% federal ITC assumption"
+              />
+            </>
+          ) : (
+            <>
+              <PrimaryMetric
+                label="Estimated Monthly Savings"
+                value={displayedSavings}
+                helper="Based on estimated solar production"
+                featured
+              />
+
+              <PrimaryMetric
+                label="Estimated System Size"
+                value={estimate.systemSizeRangeKw}
+                helper="Preliminary design range"
+              />
+
+              <PrimaryMetric
+                label="Annual Production"
+                value={displayedAnnualProduction}
+                helper="Estimated yearly output"
+              />
+            </>
+          )}
         </section>
 
         {pvWattsEstimate.status === "loading" && (
@@ -129,8 +156,9 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
             <div className="space-y-1">
               <p className="font-medium">Recommended next step</p>
               <p className="text-sm text-muted-foreground">
-                Get a custom solar design to verify roof space, shade, utility
-                rules, incentives, equipment options, and final savings.
+                {isCommercial
+                  ? "Get a custom commercial solar review to verify roof space, tax incentives, utility rates, financing options, and projected ROI."
+                  : "Get a custom solar design to verify roof space, shade, utility rules, incentives, equipment options, and final savings."}
               </p>
             </div>
           </div>
@@ -182,6 +210,28 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
                       estimate.tenYearEstimatedSavingsVsUtility
                     )}
                   />
+
+                  {isCommercial && (
+                    <>
+                      <SecondaryMetric
+                        label="Estimated System Cost"
+                        value={estimate.estimatedSystemCostLabel}
+                      />
+                      <SecondaryMetric
+                        label="Federal ITC Assumption"
+                        value={`${Math.round(estimate.federalTaxCreditRate * 100)}%`}
+                      />
+                      <SecondaryMetric
+                        label="Annual Savings"
+                        value={estimate.annualSavingsLabel}
+                      />
+                      <SecondaryMetric
+                        label="Estimated Payback"
+                        value={estimate.estimatedPaybackLabel}
+                      />
+                    </>
+                  )}
+                  
                 </div>
 
                 <PvWattsValidation lead={lead} estimate={estimate} />

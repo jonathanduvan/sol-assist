@@ -20,6 +20,10 @@ export type SolarEstimate = {
   monthlySavingsMin: number;
   monthlySavingsMax: number;
 
+  annualSavingsMin: number;
+  annualSavingsMax: number;
+  annualSavingsLabel: string;
+
   annualProductionKwh: string;
   annualProductionMinKwh: number;
   annualProductionMaxKwh: number;
@@ -39,6 +43,20 @@ export type SolarEstimate = {
   firstYearSolarCost: number;
   tenYearSolarCost: number;
   tenYearEstimatedSavingsVsUtility: number;
+
+  // Commercial / financial estimates
+  estimatedSystemCostMin: number;
+  estimatedSystemCostMax: number;
+  estimatedSystemCostLabel: string;
+
+  federalTaxCreditRate: number;
+  estimatedFederalTaxCreditMin: number;
+  estimatedFederalTaxCreditMax: number;
+  estimatedFederalTaxCreditLabel: string;
+
+  estimatedPaybackYearsMin: number;
+  estimatedPaybackYearsMax: number;
+  estimatedPaybackLabel: string;
 };
 
 export type ExternalSolarEstimate = {
