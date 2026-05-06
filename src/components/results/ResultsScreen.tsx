@@ -15,6 +15,8 @@ import { usePvWattsEstimate } from "@/hooks/use-pvwatts-estimate";
 import { CalculationBreakdown } from "./CalculationBreakdown";
 import { LeadCaptureBooking } from "./LeadCaptureBooking";
 import { PvWattsValidation } from "./PvWattsValidation";
+import { getCommercialOpportunityMessage } from "@/lib/solar/commercial-messaging";
+
 
 type Props = {
   lead: LeadInput;
@@ -68,6 +70,10 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
   const confidenceLabel = pvWattsEstimate.confidenceLabel;
 
   const isCommercial = lead.customerType === "commercial";
+
+  const commercialOpportunityMessage = isCommercial
+  ? getCommercialOpportunityMessage(lead.commercialPropertyType)
+  : null;
 
   return (
     <Card className="mx-auto w-full max-w-3xl rounded-3xl">
@@ -137,6 +143,15 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
             </>
           )}
         </section>
+
+        {commercialOpportunityMessage && (
+          <section className="rounded-2xl border bg-muted/40 p-5">
+            <p className="font-medium">Why this property may be worth reviewing</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {commercialOpportunityMessage}
+            </p>
+          </section>
+        )}
 
         {pvWattsEstimate.status === "loading" && (
           <p className="text-center text-sm text-muted-foreground">
@@ -231,7 +246,7 @@ export function ResultsScreen({ lead, estimate, score }: Props) {
                       />
                     </>
                   )}
-                  
+
                 </div>
 
                 <PvWattsValidation lead={lead} estimate={estimate} />
